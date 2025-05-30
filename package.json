@@ -1,7 +1,7 @@
 {
   "name": "crypto-portfolio",
   "version": "0.1.0",
-  "homepage": "https://becky-mining.github.io/crypto-portfolio",
+  "homepage": "https://m1kitaro.github.io/crypto-portfolio",
   "private": true,
   "dependencies": {
     "@testing-library/jest-dom": "^5.16.4",

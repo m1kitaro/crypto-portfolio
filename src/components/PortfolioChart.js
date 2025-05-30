@@ -12,6 +12,7 @@ import {
   downloadCanvasAsImage, 
   copyCanvasToClipboard,
   generateShareText,
+  generatePrivateShareText,
   generateShortShareUrl
 } from '../utils/shareUtils';
 
@@ -273,15 +274,6 @@ const PortfolioChart = ({ cryptos, totalValue, isPrivacyMode = false }) => {
     } finally {
       setIsTwitterSharing(false);
     }
-  };
-
-  // プライバシーモード用の共有テキスト生成
-  const generatePrivateShareText = (cryptos) => {
-    const symbolsList = cryptos.map(crypto => crypto.symbol).join(', ');
-    return `🌈 私の仮想通貨ポートフォリオ 💎\n` +
-           `📊 保有通貨: ${symbolsList}\n` +
-           `🔒 詳細は非公開\n` +
-           `#仮想通貨 #ポートフォリオ #投資`;
   };
 
   return (

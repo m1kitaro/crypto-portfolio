@@ -12,8 +12,7 @@ import {
   downloadCanvasAsImage, 
   copyCanvasToClipboard,
   generateShareText,
-  generatePrivateShareText,
-  generateShortShareUrl
+  generatePrivateShareText
 } from '../utils/shareUtils';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -250,15 +249,14 @@ const PortfolioChart = ({ cryptos, totalValue, isPrivacyMode = false }) => {
       const canvas = await captureChartAsImage(chartRef);
       await copyCanvasToClipboard(canvas);
       
-      // 短縮URLを生成
-      const shortUrl = await generateShortShareUrl(cryptos, isPrivacyMode);
+      // テキストのみ生成（URLなし）
       const text = isPrivacyMode ? 
         generatePrivateShareText(cryptos) : 
         generateShareText(cryptos, totalValue);
       
-      // テキストが空の場合はURLのみ
+      // テキストのみでTwitterを開く
       const twitterText = text || '';
-      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}&url=${encodeURIComponent(shortUrl)}`;
+      const twitterUrl = `https://twitter.com/intent/tweet?text=${encodeURIComponent(twitterText)}`;
       
       window.open(twitterUrl, '_blank');
       
@@ -269,7 +267,7 @@ const PortfolioChart = ({ cryptos, totalValue, isPrivacyMode = false }) => {
       setTimeout(() => setCaptureError(''), 5000); // 5秒間表示
       
     } catch (error) {
-      setCaptureError('Twitter共有用URL生成に失敗しました');
+      setCaptureError('Twitter共有でエラーが発生しました');
       console.error('Twitter共有エラー:', error);
     } finally {
       setIsTwitterSharing(false);
@@ -324,7 +322,7 @@ const PortfolioChart = ({ cryptos, totalValue, isPrivacyMode = false }) => {
           onClick={handleShareToTwitter}
           disabled={isTwitterSharing}
           className="chart-action-btn twitter-btn"
-          title={isPrivacyMode ? "Twitter共有（画像+URL、プライバシー保護）" : "Twitter共有（画像+URL）"}
+          title={isPrivacyMode ? "Twitter共有（画像+テキスト、プライバシー保護）" : "Twitter共有（画像+テキスト）"}
         >
           {isTwitterSharing ? (
             <>
@@ -334,7 +332,7 @@ const PortfolioChart = ({ cryptos, totalValue, isPrivacyMode = false }) => {
           ) : (
             <>
               <span className="emoji">{isPrivacyMode ? '🔒' : '🐦'}</span>
-              {isPrivacyMode ? '画像+URL共有' : '画像+URL共有'}
+              {isPrivacyMode ? 'Twitter共有' : 'Twitter共有'}
             </>
           )}
         </button>

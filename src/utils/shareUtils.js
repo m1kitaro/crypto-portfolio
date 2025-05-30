@@ -1,6 +1,8 @@
 import html2canvas from 'html2canvas';
 
+// URL共有機能は削除されました
 // ポートフォリオデータをURLパラメータに変換
+/*
 export const encodePortfolioToUrl = (cryptos, isPrivacyMode = false) => {
   try {
     // プライバシーモードの場合、数量と価格を除外
@@ -107,6 +109,7 @@ export const decodePortfolioFromUrl = () => {
     return null;
   }
 };
+*/
 
 // チャートを画像として取得
 export const captureChartAsImage = async (chartRef) => {

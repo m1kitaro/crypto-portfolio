@@ -3,33 +3,17 @@ import './App.css';
 import CryptoForm from './components/CryptoForm';
 import PortfolioChart from './components/PortfolioChart';
 import CryptoList from './components/CryptoList';
-import { decodePortfolioFromUrl, generateShortShareUrl } from './utils/shareUtils';
 
 function App() {
   const [cryptos, setCryptos] = useState([]);
   const [totalValue, setTotalValue] = useState(0);
-  const [shareUrl, setShareUrl] = useState('');
-  const [showShareUrl, setShowShareUrl] = useState(false);
-  const [isGeneratingUrl, setIsGeneratingUrl] = useState(false);
-  const [urlError, setUrlError] = useState('');
   const [isPrivacyMode, setIsPrivacyMode] = useState(false);
 
   useEffect(() => {
-    // URLパラメータからポートフォリオを復元
-    const urlPortfolio = decodePortfolioFromUrl();
-    if (urlPortfolio) {
-      // IDを付与
-      const portfolioWithIds = urlPortfolio.map((crypto, index) => ({
-        ...crypto,
-        id: Date.now() + index
-      }));
-      setCryptos(portfolioWithIds);
-    } else {
-      // ローカルストレージから復元
-      const savedCryptos = localStorage.getItem('cryptoPortfolio');
-      if (savedCryptos) {
-        setCryptos(JSON.parse(savedCryptos));
-      }
+    // ローカルストレージから復元
+    const savedCryptos = localStorage.getItem('cryptoPortfolio');
+    if (savedCryptos) {
+      setCryptos(JSON.parse(savedCryptos));
     }
   }, []);
 
@@ -45,42 +29,6 @@ function App() {
 
   const deleteCrypto = (id) => {
     setCryptos(cryptos.filter(crypto => crypto.id !== id));
-  };
-
-  const generateShareUrl = async () => {
-    if (cryptos.length === 0) {
-      alert('共有するポートフォリオがありません');
-      return;
-    }
-    
-    setIsGeneratingUrl(true);
-    setUrlError('');
-    
-    try {
-      const shortUrl = await generateShortShareUrl(cryptos, isPrivacyMode);
-      setShareUrl(shortUrl);
-      setShowShareUrl(true);
-    } catch (error) {
-      setUrlError('短縮URLの生成に失敗しました。しばらく待ってから再試行してください。');
-      console.error('短縮URL生成エラー:', error);
-    } finally {
-      setIsGeneratingUrl(false);
-    }
-  };
-
-  const copyShareUrl = async () => {
-    try {
-      await navigator.clipboard.writeText(shareUrl);
-      alert('📋 短縮URLをクリップボードにコピーしました！');
-    } catch (error) {
-      alert('コピーに失敗しました');
-    }
-  };
-
-  const closeShareModal = () => {
-    setShowShareUrl(false);
-    setShareUrl('');
-    setUrlError('');
   };
 
   const togglePrivacyMode = () => {
@@ -126,24 +74,6 @@ function App() {
                   </span>
                 </label>
               </div>
-              
-              <button 
-                onClick={generateShareUrl} 
-                disabled={isGeneratingUrl}
-                className="share-url-btn"
-              >
-                {isGeneratingUrl ? (
-                  <>
-                    <span className="spinner"></span>
-                    短縮URL生成中...
-                  </>
-                ) : (
-                  <>
-                    <span className="emoji">🔗</span>
-                    ポートフォリオを共有
-                  </>
-                )}
-              </button>
             </div>
           )}
         </header>
@@ -184,63 +114,6 @@ function App() {
             <CryptoList cryptos={cryptos} onDeleteCrypto={deleteCrypto} isPrivacyMode={isPrivacyMode} />
           </div>
         </div>
-
-        {/* Share URL Modal */}
-        {showShareUrl && (
-          <div className="modal-overlay" onClick={closeShareModal}>
-            <div className="modal-content" onClick={(e) => e.stopPropagation()}>
-              <h3 className="modal-title">
-                <span className="emoji">🔗</span>
-                短縮共有URL
-              </h3>
-              <p className="modal-description">
-                <span className="emoji">✨</span>
-                短縮URLを生成しました！このURLを共有することで、あなたのポートフォリオを他の人に見せることができます。
-                {isPrivacyMode && (
-                  <span className="privacy-notice">
-                    <br />
-                    <span className="emoji">🔒</span>
-                    プライバシーモードがオンのため、数量・価格は表示されません。
-                  </span>
-                )}
-              </p>
-              <div className="url-container">
-                <input
-                  type="text"
-                  value={shareUrl}
-                  readOnly
-                  className="url-input"
-                />
-                <button onClick={copyShareUrl} className="copy-url-btn">
-                  <span className="emoji">📋</span>
-                  コピー
-                </button>
-              </div>
-              <div className="url-info">
-                <span className="emoji">🎯</span>
-                短縮URLで共有しやすくなりました！
-              </div>
-              <div className="modal-actions">
-                <button onClick={closeShareModal} className="close-btn">
-                  閉じる
-                </button>
-              </div>
-            </div>
-          </div>
-        )}
-
-        {/* URL Generation Error */}
-        {urlError && (
-          <div className="error-notification">
-            <div className="error-content">
-              <span className="emoji">⚠️</span>
-              {urlError}
-              <button onClick={() => setUrlError('')} className="error-close">
-                ×
-              </button>
-            </div>
-          </div>
-        )}
       </div>
     </div>
   );
